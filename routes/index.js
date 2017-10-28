@@ -1,54 +1,128 @@
 const router = require('koa-router')()
 const path = require('path')
 const fs = require('fs')
-const iconv = require('iconv-lite')
 const request = require('request')
 const superagent = require('superagent')
 const axios = require('axios')
 const utils = require('../utils')
 const { QQ_MUSIC } = require('../config')
 
-router.get('/music', async(ctx, next) => {
-  const url = 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp'
-  const headers = {
-    'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'accept-encoding':'gzip, deflate, br',
-    'accept-language':'zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4',
-    'cache-control':'max-age=0',
-    'upgrade-insecure-requests':1,
-    'user-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
-  }
-
-  let { data } = await axios({
-    url,
-    headers,
+router.get('/hotkey', async(ctx, next) => {
+  const { data } = await axios({
+    url: 'https://c.y.qq.com/splcloud/fcgi-bin/gethotkey.fcg',
+    headers: QQ_MUSIC.HEADER_MOBILE,
     params: {
-      ct: 24,
-      qqmusic_ver: 1298,
-      new_json: 1,
-      remoteplace: 'txt.yqq.song',
-      t: 0,
-      aggr: 1,
-      cr: 1,
-      catZhida: 1,
-      lossless: 0,
-      flag_qc: 0,
-      p: 1,
-      n: 20,
-      w: '林俊杰',
       g_tk: 5381,
-      loginUin: 0,
-      hostUin: 0,
+      uin: 0,
       format: 'json',
-      inCharset: 'utf8',
+      inCharset: 'utf-8',
       outCharset: 'utf-8',
       notice: 0,
-      platform: 'yqq',
-      needNewCode: 0,
+      platform: 'h5',
+      needNewCode: 1,
+      _: new Date().getTime()
     }
   })
-  ctx.body = data.data.song
+  ctx.body = data
+})
 
+router.get('/album/:albumid', async(ctx, next) => {
+  const { data } = await axios({
+    url: 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg',
+    headers: QQ_MUSIC.HEADER_MOBILE,
+    params: {
+      albumid: ctx.params.albumid,
+      g_tk: 5381,
+      uin: 0,
+      format: 'json',
+      inCharset: 'utf-8',
+      outCharset: 'utf-8',
+      notice: 0,
+      platform: 'h5',
+      needNewCode: 1,
+      _: new Date().getTime()
+    }
+  })
+  ctx.body = data
+})
+
+router.get('/singer/:singermid', async(ctx, next) => {
+  const { data } = await axios({
+    url: 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg',
+    params: {
+      singermid: ctx.params.singermid,
+      g_tk: 5381,
+      uin: 0,
+      format: 'json',
+      inCharset: 'utf-8',
+      outCharset: 'utf-8',
+      notice: 0,
+      platform: 'h5page',
+      needNewCode: 1,
+      order: 'listen',
+      from: 'h5',
+      num: 15,
+      begin: 0,
+      _: new Date().getTime()
+    },
+    headers: QQ_MUSIC.HEADER_MOBILE
+  })
+
+  ctx.body = data
+})
+
+router.get('/toplist/:topid', async(ctx, next) => {
+  /**
+   *  3  欧美
+   *  4  流行指数
+   *  5  内地
+   *  6  港台
+   *  16 韩国
+   *  17 日本
+   *  26 巅峰榜 热歌
+   *  27 新歌
+   *  28 网络歌曲
+   *  30 梦想的声音
+   *  36 K歌金曲
+   *  52 腾讯音乐人原创榜
+   *  
+   */
+  const { data } = await axios({
+    url: `https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg`,
+    params: {
+      g_tk: 5381,
+      uin: 0,
+      format: 'json',
+      inCharset: 'utf-8',
+      outCharset: 'utf-8',
+      notice: 0,
+      platform: 'h5',
+      needNewCode: 1,
+      tpl: 3,
+      page: 'detail',
+      type: 'top',
+      topid: ctx.params.topid,
+      _: new Date().getTime()
+    },
+    headers: QQ_MUSIC.HEADER_MOBILE
+  })
+  ctx.body = data
+
+})
+
+router.get('/toplistopt', async(ctx, next) => {
+  const { data } = await axios({
+    url: `https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_opt.fcg`,
+    params: {
+      page: 'index',
+      format: 'html',
+      tpl: 'macv4',
+      v8debug: 1,
+      jsonCallback:'jsonCallback'
+    },
+    headers: QQ_MUSIC.HEADER
+  })
+  ctx.body = data
 
 })
 

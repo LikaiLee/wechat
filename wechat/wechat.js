@@ -4,9 +4,9 @@ const util = require('util')
 const superagent = require('superagent')
 const axios = require('axios')
 const service = require('../service/wechat')
+const QQMuiscService = require('../service/QQMusic')
 const utils = require('../utils')
 const wxUtils = require('./wxUtils')
-const { QQ_MUSIC } = require('../config')
 
 function Wechat(opts) {
   const self = this
@@ -99,73 +99,11 @@ Wechat.prototype.reply = async function(ctx, fromUserMsg) {
   let { MsgType, Event } = fromUserMsg
   if (MsgType === 'event') {
     replyMsg = await wxUtils.handleEvent(Event, fromUserMsg)
-  } else if (MsgType === 'text') {
-    const content = fromUserMsg.Content
-
-    const { data } = await axios({
-      url: 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp',
-      method: 'GET',
-      headers: QQ_MUSIC.HEADER,
-      params: {
-        ct: 24,
-        qqmusic_ver: 1298,
-        new_json: 1,
-        remoteplace: 'txt.yqq.song',
-        t: 0,
-        aggr: 1,
-        cr: 1,
-        catZhida: 1,
-        lossless: 0,
-        flag_qc: 0,
-        p: 1,
-        n: 20,
-        w: content,
-        g_tk: 5381,
-        loginUin: 0,
-        hostUin: 0,
-        format: 'json',
-        inCharset: 'utf8',
-        outCharset: 'utf-8',
-        notice: 0,
-        platform: 'yqq',
-        needNewCode: 0,
-      }
-    })
-    const totalNum = data.data.song.totalnum
-
-    if (totalNum > 0) {
-      let baseMsg = `共有 ${totalNum} 首关于 ${content} 的音乐`
-      if (totalNum > 1) {
-        baseMsg += '， 先来三条哈'
-      }
-      let count = totalNum >= 3 ? 3 : 1
-      let song = data.data.song
-      for (let i = 0; i < count; i++) {
-        const record = song.list[i]
-        const musicId = record.file.strMediaMid
-        const songName = record.title
-        const singers = record.singer
-        let singer = ''
-        singers.forEach(s => {
-          singer += s.name + ' '
-        })
-        const musicUrl = `http://ws.stream.qqmusic.qq.com/C100${musicId}.m4a?fromtag=38`
-
-        replyMsg +=
-          `\n 歌名：${songName}
- 歌手：${singer}
- 链接：${musicUrl}`
-      }
-
-      replyMsg = baseMsg + replyMsg
-
-    } else {
-      replyMsg = `找不到关于 ${content} 的音乐`
-    }
-
-    // replyMsg = wxUtils.handleTextMsg(content)
-
-
+  }
+  if (MsgType === 'text') {
+    const keyword = fromUserMsg.Content
+    const data = await QQMuiscService.searchMusic(keyword)
+    replyMsg = await wxUtils.handleMusic(data, keyword)
   }
 
   wxUtils.replyMessage.call(ctx, replyMsg, fromUserMsg)
