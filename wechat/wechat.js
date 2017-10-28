@@ -103,25 +103,32 @@ Wechat.prototype.reply = async function(ctx, fromUserMsg) {
     const content = fromUserMsg.Content
 
     const { data } = await axios({
-      url: 'http://s.music.qq.com/fcgi-bin/music_search_new_platform',
+      url: 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp',
       method: 'GET',
       headers: QQ_MUSIC.HEADER,
       params: {
-        w: content,
+        ct: 24,
+        qqmusic_ver: 1298,
+        new_json: 1,
+        remoteplace: 'txt.yqq.song',
         t: 0,
-        n: 500,
         aggr: 1,
         cr: 1,
+        catZhida: 1,
+        lossless: 0,
+        flag_qc: 0,
+        p: 1,
+        n: 20,
+        w: content,
+        g_tk: 5381,
         loginUin: 0,
+        hostUin: 0,
         format: 'json',
-        inCharset: 'GB2312',
+        inCharset: 'utf8',
         outCharset: 'utf-8',
         notice: 0,
-        platform: 'jqminiframe.json',
+        platform: 'yqq',
         needNewCode: 0,
-        p: 1,
-        catZhida: 0,
-        remoteplace: 'sizer.newclient.next_song'
       }
     })
     const totalNum = data.data.song.totalnum
@@ -129,20 +136,25 @@ Wechat.prototype.reply = async function(ctx, fromUserMsg) {
     if (totalNum > 0) {
       let baseMsg = `共有 ${totalNum} 首关于 ${content} 的音乐`
       if (totalNum > 1) {
-        baseMsg += '， 默认先显示三条哈'
+        baseMsg += '， 先来三条哈'
       }
       let count = totalNum >= 3 ? 3 : 1
+      let song = data.data.song
       for (let i = 0; i < count; i++) {
-        const firstRecord = data.data.song.list[i]
-        const musicId = firstRecord.f.split('|')[0]
-        const songName = firstRecord.fsong
-        const singerName = firstRecord.fsinger + firstRecord.fsinger2
-        const musicUrl = `http://ws.stream.qqmusic.qq.com/${musicId}.m4a?fromtag=46`
-        
+        const record = song.list[i]
+        const musicId = record.file.strMediaMid
+        const songName = record.title
+        const singers = record.singer
+        let singer = ''
+        singers.forEach(s => {
+          singer += s.name + ' '
+        })
+        const musicUrl = `http://ws.stream.qqmusic.qq.com/C100${musicId}.m4a?fromtag=38`
+
         replyMsg +=
-          `\n  歌名：${songName}
-  歌手：${singerName}
-  链接：${musicUrl}`
+          `\n 歌名：${songName}
+ 歌手：${singer}
+ 链接：${musicUrl}`
       }
 
       replyMsg = baseMsg + replyMsg

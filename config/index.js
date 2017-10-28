@@ -26,15 +26,13 @@ const config = {
   },
   QQ_MUSIC: {
     HEADER: {
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-      'Accept-Encoding': 'gzip, deflate',
-      'Accept-Language': 'zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4',
-      'Cache-Control': 'max-age=0',
-      'Connection': 'keep-alive',
-      'Host': 's.music.qq.com',
-      'Upgrade-Insecure-Requests': 1,
-      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
-    }
+    'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'accept-encoding':'gzip, deflate, br',
+    'accept-language':'zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4',
+    'cache-control':'max-age=0',
+    'upgrade-insecure-requests':1,
+    'user-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
+  }
   }
 }
 
