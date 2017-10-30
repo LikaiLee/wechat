@@ -194,6 +194,7 @@ exports.handleMusic = async(data, keyword) => {
       const record = song.list[i]
       const musicId = record.file.strMediaMid
       const songName = record.title
+      const album = record.album.title
       const photoId = record.album.mid
       const singers = record.singer
       let singer = ''
@@ -205,6 +206,7 @@ exports.handleMusic = async(data, keyword) => {
 
       replyMsg +=
         `\n 歌名：${songName}
+ 专辑：${album}
  歌手：${singer}
  链接：${musicUrl}
  海报：https://y.gtimg.cn/music/photo_new/T002R300x300M000${photoId}.jpg?max_age=2592000
