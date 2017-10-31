@@ -95,15 +95,22 @@ Wechat.prototype.isValidAccessToken = data => {
  */
 Wechat.prototype.reply = async function(ctx, fromUserMsg) {
   const self = this
-  let replyMsg = ' '
+  let replyMsg = ''
   let { MsgType, Event } = fromUserMsg
   if (MsgType === 'event') {
     replyMsg = await wxUtils.handleEvent(Event, fromUserMsg)
   }
   if (MsgType === 'text') {
     const keyword = fromUserMsg.Content
-    const data = await QQMuiscService.searchMusic(keyword)
-    replyMsg = await wxUtils.handleMusic(data, keyword)
+
+    if (keyword.startsWith('kb')) {
+      replyMsg = await wxUtils.handleTimeTable(keyword)
+    }
+    if (keyword.startsWith('music')) {
+      const key = keyword.split('music')[1].trim()
+      const data = await QQMuiscService.searchMusic(key)
+      replyMsg = await wxUtils.handleMusic(data, key)
+    }
   }
 
   wxUtils.replyMessage.call(ctx, replyMsg, fromUserMsg)

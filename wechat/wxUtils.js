@@ -221,6 +221,26 @@ exports.handleMusic = async(data, keyword) => {
   return replyMsg
 }
 
+exports.handleTimeTable = async(keyword) => {
+  const stuInfo = keyword.split('kb')[1].trim()
+  const stuId = stuInfo.split(' ')[0]
+  const pwd = stuInfo.split(' ')[1]
+  const timeTable = await axios.get(`http://120.24.250.209:233/${stuId}/${pwd}`)
+  if (timeTable.data.statusCode === 200) {
+    const table = timeTable.data.response
+    table.forEach(t => {
+      replyMsg += `课程：${t.course}
+教室：${t.classroom}
+老师：${t.teacher}
+时间：${t.duration}`
+    })
+  } else {
+    replyMsg = '学号或密码错误'
+  }
+
+  return replyMsg
+}
+
 
 const _formatMessage = message => {
   let fmtMsg = {}
