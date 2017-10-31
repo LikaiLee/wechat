@@ -1,5 +1,6 @@
 const xml2js = require('xml2js')
 const sha1 = require('sha1');
+const axios = require('axios')
 const compileTpl = require('./tpl')
 const { WECHAT } = require('../config');
 const { TOKEN } = WECHAT
@@ -222,6 +223,7 @@ exports.handleMusic = async(data, keyword) => {
 }
 
 exports.handleTimeTable = async(keyword) => {
+  let replyMsg = ''
   const stuInfo = keyword.split('kb')[1].trim()
   const stuId = stuInfo.split(' ')[0]
   const pwd = stuInfo.split(' ')[1]
