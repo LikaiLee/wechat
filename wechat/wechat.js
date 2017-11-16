@@ -95,7 +95,7 @@ Wechat.prototype.isValidAccessToken = data => {
  */
 Wechat.prototype.reply = async function(ctx, fromUserMsg) {
   const self = this
-  let replyMsg = ''
+  let replyMsg = '回复 music/kb 关键词'
   let { MsgType, Event } = fromUserMsg
   if (MsgType === 'event') {
     replyMsg = await wxUtils.handleEvent(Event, fromUserMsg)
