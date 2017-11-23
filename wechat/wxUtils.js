@@ -87,9 +87,11 @@ exports.handleEvent = async(Event, fromUserMsg) => {
       replyMsg = ''
       break;
     case 'LOCATION':
+      let time = new Date(fromUserMsg.CreateTime * 1000).toLocaleString()
       replyMsg = `latitude = ${fromUserMsg.Latitude}
-         - longitude = ${fromUserMsg.Longitude}
-         - ${fromUserMsg.Precision}`
+longitude = ${fromUserMsg.Longitude}
+precision = ${fromUserMsg.Precision}
+time = ${time}`
       break;
     case 'CLICK':
       replyMsg = `您点击了菜单：${fromUserMsg.EventKey}`
@@ -231,7 +233,8 @@ exports.handleTimeTable = async(keyword) => {
   if (timeTable.data.statusCode === 200) {
     const table = timeTable.data.response
     table.forEach(t => {
-      replyMsg += `课程：${t.course}
+      replyMsg += `
+课程：${t.course}
 教室：${t.classroom}
 老师：${t.teacher}
 时间：${t.duration}`

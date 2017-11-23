@@ -16,6 +16,57 @@ function Wechat(opts) {
   this.fetchAccessToken()
 
 }
+
+/**
+ * [reply 回复消息]
+ * @param  {[type]} ctx         [description]
+ * @param  {[type]} fromUserMsg [description]
+ * @return {[type]}             [description]
+ */
+Wechat.prototype.reply = async function(ctx, fromUserMsg) {
+  const self = this
+  let replyMsg = '回复 music/kb 关键词 如：music 周杰伦'
+  let { MsgType, Event } = fromUserMsg
+  if (MsgType === 'event') {
+    replyMsg = await wxUtils.handleEvent(Event, fromUserMsg)
+  }
+  if (MsgType === 'text') {
+    const keyword = fromUserMsg.Content
+
+    if (keyword.startsWith('kb')) {
+      replyMsg = await wxUtils.handleTimeTable(keyword)
+    } else if (keyword.startsWith('music')) {
+      const key = keyword.split('music')[1].trim()
+      const data = await QQMuiscService.searchMusic(key)
+      replyMsg = await wxUtils.handleMusic(data, key)
+    } else if (keyword === 'news') {
+      replyMsg = [
+        {
+          title: 'Baidu',
+          description: 'Baidu',
+          picUrl: 'https://www.baidu.com/img/bd_logo1.png',
+          url: 'https://www.baidu.com'
+        },
+        {
+          title: 'introduction',
+          description: 'LiKaiLee',
+          picUrl: 'http://mmbiz.qpic.cn/mmbiz_jpg/uOuD3pg5nO91PV0BqCpSiauJiaCKewaJpk5OtPFQhZ5gjoIh2rib4ArRO3rg5pFpUJezndJOSfln8e6QfomZfu2Iw/0',
+          url: 'http://lilikai.tk/projects/me'
+        }
+      ]
+    } else if (keyword === 'user') {
+      const { access_token } = await self.fetchAccessToken()
+      const res = await superagent
+          .get(`https://api.weixin.qq.com/cgi-bin/user/get?access_token=${access_token}`)
+          // console.log(res.body)
+      replyMsg = JSON.stringify(res.body)
+    } else {
+      replyMsg = `内容是：${fromUserMsg.Content}`
+    }
+
+  }
+  wxUtils.replyMessage.call(ctx, replyMsg, fromUserMsg)
+}
 /**
  * [fetchAccessToken 刚开始实例化时生成access_token ]
  * 当用到时检查其是否有效，若无效进行更新
@@ -87,34 +138,6 @@ Wechat.prototype.isValidAccessToken = data => {
   }
 }
 
-/**
- * [reply 回复消息]
- * @param  {[type]} ctx         [description]
- * @param  {[type]} fromUserMsg [description]
- * @return {[type]}             [description]
- */
-Wechat.prototype.reply = async function(ctx, fromUserMsg) {
-  const self = this
-  let replyMsg = '回复 music/kb 关键词'
-  let { MsgType, Event } = fromUserMsg
-  if (MsgType === 'event') {
-    replyMsg = await wxUtils.handleEvent(Event, fromUserMsg)
-  }
-  if (MsgType === 'text') {
-    const keyword = fromUserMsg.Content
-
-    if (keyword.startsWith('kb')) {
-      replyMsg = await wxUtils.handleTimeTable(keyword)
-    }
-    if (keyword.startsWith('music')) {
-      const key = keyword.split('music')[1].trim()
-      const data = await QQMuiscService.searchMusic(key)
-      replyMsg = await wxUtils.handleMusic(data, key)
-    }
-  }
-
-  wxUtils.replyMessage.call(ctx, replyMsg, fromUserMsg)
-}
 
 /**
  * [uploadTempMaterail 上传临时素材]
