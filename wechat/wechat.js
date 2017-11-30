@@ -23,10 +23,13 @@ function Wechat(opts) {
  * @param  {[type]} fromUserMsg [description]
  * @return {[type]}             [description]
  */
-Wechat.prototype.reply = async function(ctx, fromUserMsg) {
+Wechat.prototype.reply = async function (ctx, fromUserMsg) {
   const self = this
   let replyMsg = '回复 music/kb 关键词 如：music 周杰伦'
-  let { MsgType, Event } = fromUserMsg
+  let {
+    MsgType,
+    Event
+  } = fromUserMsg
   if (MsgType === 'event') {
     replyMsg = await wxUtils.handleEvent(Event, fromUserMsg)
   }
@@ -40,8 +43,7 @@ Wechat.prototype.reply = async function(ctx, fromUserMsg) {
       const data = await QQMuiscService.searchMusic(key)
       replyMsg = await wxUtils.handleMusic(data, key)
     } else if (keyword === 'news') {
-      replyMsg = [
-        {
+      replyMsg = [{
           title: 'Baidu',
           description: 'Baidu',
           picUrl: 'https://www.baidu.com/img/bd_logo1.png',
@@ -55,10 +57,12 @@ Wechat.prototype.reply = async function(ctx, fromUserMsg) {
         }
       ]
     } else if (keyword === 'user') {
-      const { access_token } = await self.fetchAccessToken()
+      const {
+        access_token
+      } = await self.fetchAccessToken()
       const res = await superagent
-          .get(`https://api.weixin.qq.com/cgi-bin/user/get?access_token=${access_token}`)
-          // console.log(res.body)
+        .get(`https://api.weixin.qq.com/cgi-bin/user/get?access_token=${access_token}`)
+      // console.log(res.body)
       replyMsg = JSON.stringify(res.body)
     } else {
       replyMsg = `内容是：${fromUserMsg.Content}`
@@ -67,12 +71,29 @@ Wechat.prototype.reply = async function(ctx, fromUserMsg) {
   }
   wxUtils.replyMessage.call(ctx, replyMsg, fromUserMsg)
 }
+
+/**
+ * 创建菜单
+ */
+Wechat.prototype.createMenu = async function () {
+  const self = this
+  const {
+    access_token
+  } = await self.fetchAccessToken()
+  const res = await service.createMenu(access_token)
+  if (res.errcode === 0) {
+    console.log('create menu successfully')
+  } else {
+    console.log(res)
+  }
+}
+
 /**
  * [fetchAccessToken 刚开始实例化时生成access_token ]
  * 当用到时检查其是否有效，若无效进行更新
  * @return {[type]} [description]
  */
-Wechat.prototype.fetchAccessToken = function() {
+Wechat.prototype.fetchAccessToken = function () {
   const self = this;
   if (this.access_token && this.expires_in) {
     if (this.isValidAccessToken(this)) {
@@ -126,7 +147,10 @@ Wechat.prototype.updateAccessToken = (self) => {
 }
 Wechat.prototype.isValidAccessToken = data => {
 
-  let { access_token, expires_in } = data
+  let {
+    access_token,
+    expires_in
+  } = data
   if (!access_token || !expires_in) {
     return false
   }
@@ -144,7 +168,7 @@ Wechat.prototype.isValidAccessToken = data => {
  * @param  {[type]} ctx [description] image video music...
  * @return {[type]}     [description]
  */
-Wechat.prototype.uploadTempMaterail = async function(type, filepath) {
+Wechat.prototype.uploadTempMaterail = async function (type, filepath) {
   return await service.uploadTempMaterail(type, filepath, this.access_token)
 }
 
@@ -154,7 +178,7 @@ Wechat.prototype.uploadTempMaterail = async function(type, filepath) {
  * @param  {[type]} form [description]
  * @return {[type]}      [description]
  */
-Wechat.prototype.uploadPermanentMaterail = async function(type, form) {
+Wechat.prototype.uploadPermanentMaterail = async function (type, form) {
   return await service.uploadPermanentMaterail(type, form, this.access_token)
 }
 

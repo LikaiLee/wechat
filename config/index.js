@@ -6,17 +6,18 @@ const config = {
   BASE_API: 'https://api.weixin.qq.com/',
   WECHAT: {
     TOKEN: 'likailee2017wexintoken',
-    APP_ID: 'wx91bc09bdf1fa51f8',
-    APP_SECRET: '9a343e591e14a706a7cc2279400422b4',
+    APP_ID: 'wx1cdba5f9a9121be0',
+    APP_SECRET: '7512592bebedc18e26de8125d5f3dccc',
     ACCESS_TOKEN_URL: 'cgi-bin/token', // 获取access_token
     WEIXIN_SERVER_URL: 'cgi-bin/getcallbackip', // 获取微信服务器IP
     UPLOAD_TEMP_URL: 'cgi-bin/media/upload', // 上传临时素材
-    UPLOAD_PERMANENT: {
+    UPLOAD_PERMANENT: {// 上传永久素材
       PREFIX: 'cgi-bin/media/',
       UPLOAD_IMG: 'cgi-bin/media/uploadimg',
       ADD_NEWS_URL: 'cgi-bin/material/add_news',
       ADD_MATERIAL: 'cgi-bin/material/add_material'
     },
+    CREATE_MENU: 'cgi-bin/menu/create',// 创建菜单
     getAccessToken: () => {
       return utils.readFileAsync(wechat_file_path, 'utf-8')
     },

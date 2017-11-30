@@ -1,14 +1,19 @@
 const fs = require('fs')
 const request = require('request')
+const superagent = require('superagent')
 const fetch = require('../utils/fetch');
-const { BASE_API, WECHAT } = require('../config');
+const {
+  BASE_API,
+  WECHAT
+} = require('../config');
 const {
   APP_ID,
   APP_SECRET,
   ACCESS_TOKEN_URL,
   WEIXIN_SERVER_URL,
   UPLOAD_TEMP_URL,
-  UPLOAD_PERMANENT
+  UPLOAD_PERMANENT,
+  CREATE_MENU
 } = WECHAT
 
 /**
@@ -16,7 +21,9 @@ const {
  * @return {[type]} [description]
  */
 exports.getAccessToken = async() => {
-  const { data } = await fetch({
+  const {
+    data
+  } = await fetch({
     method: 'GET',
     url: ACCESS_TOKEN_URL,
     params: {
@@ -34,7 +41,9 @@ exports.getAccessToken = async() => {
  * @return {[type]}              [description]
  */
 exports.getWeixinServer = async(access_token) => {
-  const { data } = await fetch({
+  const {
+    data
+  } = await fetch({
     method: 'GET',
     url: WEIXIN_SERVER_URL,
     params: {
@@ -84,4 +93,39 @@ exports.uploadPermanentMaterail = (type, form, access_token) => {
     })
     // resolve(`${BASE_API}${type}?access_token=${access_token}`)
   })
+}
+
+exports.createMenu = async(access_token) => {
+
+  const {
+    body
+  } = await superagent
+    .post(`${BASE_API}${CREATE_MENU}`)
+    .query({
+      access_token
+    })
+    .send({
+      "button": [{
+          "type": "click",
+          "name": "今日歌曲",
+          "key": "V1001_TODAY_MUSIC"
+        },
+        {
+          "name": "菜单",
+          "sub_button": [{
+              "type": "view",
+              "name": "搜索",
+              "url": "http://www.soso.com/"
+            },
+            {
+              "type": "click",
+              "name": "赞一下我们",
+              "key": "V1001_GOOD"
+            }
+          ]
+        }
+      ]
+    })
+  return body
+
 }

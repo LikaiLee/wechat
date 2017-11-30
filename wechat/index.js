@@ -7,8 +7,9 @@ const utils = require('../utils')
 
 module.exports = (opts) => {
 
-  const wechat = new Wechat(opts);
-
+  const wechat = new Wechat(opts)
+  wechat.createMenu()
+  
   return async(ctx, next) => {
     const { isFromWechat, echoStr } = wxUtils.auth(ctx)
     console.log('> isFromWechat: ' + isFromWechat)
