@@ -33,6 +33,10 @@ Wechat.prototype.reply = async function (ctx, fromUserMsg) {
   if (MsgType === 'event') {
     replyMsg = await wxUtils.handleEvent(Event, fromUserMsg)
   }
+  if (MsgType === 'location') {
+    const lable = fromUserMsg.Label
+    replyMsg = `位置：${lable}`
+  }
   if (MsgType === 'text') {
     const keyword = fromUserMsg.Content
 

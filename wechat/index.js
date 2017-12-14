@@ -8,7 +8,7 @@ const utils = require('../utils')
 module.exports = (opts) => {
 
   const wechat = new Wechat(opts)
-  wechat.createMenu()
+  // wechat.createMenu()
   
   return async(ctx, next) => {
     const { isFromWechat, echoStr } = wxUtils.auth(ctx)
@@ -20,7 +20,7 @@ module.exports = (opts) => {
 
     const rawBody = await getRawBody(ctx.req)
     const fromUserMsg = await wxUtils.parseXMLAsync(rawBody)
-    // console.log('content = ' + fromUserMsg.Content)
+    console.log(fromUserMsg)
 
     await wechat.reply(ctx, fromUserMsg)
 

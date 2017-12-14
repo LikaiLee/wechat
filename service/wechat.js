@@ -106,6 +106,10 @@ exports.createMenu = async(access_token) => {
     })
     .send({
       "button": [{
+          "name": "发送位置",
+          "type": "location_select",
+          "key": "rselfmenu_2_0"
+        }, {
           "type": "click",
           "name": "今日歌曲",
           "key": "V1001_TODAY_MUSIC"

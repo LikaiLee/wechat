@@ -43,6 +43,7 @@ exports.parseXMLAsync = xml => {
       if (err) {
         reject(err)
       } else {
+        // console.log(content.xml)
         const fromUserMsg = _formatMessage(content.xml)
         resolve(fromUserMsg)
       }
@@ -255,8 +256,12 @@ const _formatMessage = message => {
 
   Object.keys(message).forEach((key, index) => {
     let value = message[key][0];
-    fmtMsg[key] = (value || '').trim()
+    if(typeof value === 'string') {
+      fmtMsg[key] = (value || '').trim()
+    } else {
+      fmtMsg[key] = value
+    }
   })
-
+  
   return fmtMsg;
 }
